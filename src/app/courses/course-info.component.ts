@@ -1,18 +1,22 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
+import { Course } from "./course";
+import { CouseService } from "./course-service";
+
+type course = Course;
 
 @Component({
     templateUrl: './course-info.component.html'
 })
 export class CourseInfoComponent implements OnInit {
 
-    courseId: number = 0;
+    course: course = new Course;
 
-    constructor(private activatedRoute: ActivatedRoute) { }
+    constructor(private activatedRoute: ActivatedRoute, private courseService: CouseService) { }
 
     ngOnInit(): void {
 
-        this.courseId = Number(this.activatedRoute.snapshot.paramMap.get('id'));
+        this.course = this.courseService.retrieveById(Number(this.activatedRoute.snapshot.paramMap.get('id')));
         
     }
 }
