@@ -1,35 +1,56 @@
-import { Component, OnInit } from "@angular/core";
-import { Course } from "./course";
-import { CouseService } from "./course-service";
+import { Component, OnInit } from '@angular/core';
+import { Course } from './course';
+import { CouseService } from './course-service';
 
 @Component({
-     templateUrl: './course-list.component.html'
+  templateUrl: './course-list.component.html',
 })
-export class CourseListComponent implements OnInit{
+export class CourseListComponent implements OnInit {
+  filteredCourses: Course[] = [];
 
-    filteredCourses: Course[] = [];
+  _courses: Course[] = [];
 
-    _courses: Course[] = [];
+  _filterBy: string = '';
 
-    _filterBy: string = '';
+  constructor(private courseService: CouseService) {}
 
-    constructor(private courseService: CouseService){
+  ngOnInit(): void {
+    this.retrieveAll();
+  }
 
-    }
-
-    ngOnInit(): void {
-        this._courses = this.courseService.retrieveAll();
+  retrieveAll(): void {
+    this.courseService.retrieveAll().subscribe({
+      next: (courses) => {
+        this._courses = courses;
         this.filteredCourses = this._courses;
-    }
+      },
+      error: err => console.log('Error', err)
+    });
+  }
 
-    set filter(value: string){
-        this._filterBy = value;
+  deleteById(courseId: number): void {
+      this.courseService.deleteById(courseId).subscribe({
+        next: () => {
+            alert('Deleted with success');
+            this.retrieveAll();
+        },
+        error: err => console.log('Error', err)
+        
+      })
+  }
 
-        this.filteredCourses = this._courses.filter((course: Course) => course.name.toLocaleLowerCase().indexOf(this._filterBy.toLocaleLowerCase()) > -1);
-    }
+  set filter(value: string) {
+    this._filterBy = value;
 
-    get filter(){
-        return this._filterBy;
-    }
-    
+    this.filteredCourses = this._courses.filter(
+      (course: Course) =>
+        course.name
+          .toLocaleLowerCase()
+          .indexOf(this._filterBy.toLocaleLowerCase()) > -1
+    );
+  }
+
+  get filter() {
+    return this._filterBy;
+  }
 }
